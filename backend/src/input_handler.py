@@ -10,12 +10,13 @@ def extract_text_from_pdf(file_path):
     return text
 
 
-def load_text(input_data, is_file=True):
-    if is_file:
-        if input_data.endswith(".pdf"):
-            return extract_text_from_pdf(input_data)
-        elif input_data.endswith(".txt"):
-            with open(input_data, "r", encoding="utf-8") as f:
-                return f.read()
+def load_text(file_path, text):
+    if file_path != None:
+        if file_path.endswith(".pdf"):
+            return extract_text_from_pdf(file_path)
     else:
-        return input_data
+        return text
+    
+def rank_chunks(chunks):
+    ranked_chunks = chunks
+    return ranked_chunks
