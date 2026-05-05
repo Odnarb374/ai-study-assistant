@@ -17,6 +17,3 @@ def load_text(file_path, text):
     else:
         return text
     
-def rank_chunks(chunks):
-    ranked_chunks = chunks
-    return ranked_chunks

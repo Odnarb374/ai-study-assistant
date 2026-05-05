@@ -3,8 +3,8 @@ from summarizer import summarize
 from keywords import extract_keywords
 from question_generator import generate_questions
 from flashcards import generate_flashcards
-
 from transformers import AutoTokenizer
+
 
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
@@ -27,14 +27,11 @@ def run_pipeline(file_path=None, text=None):
     
     # Chunk
     chunks = chunk_text(loaded_text)
-    
-    # Rank chunks
-    ranked_chunks = rank_chunks(chunks)
-
+ 
     # Generate outputs
-    summary = summarize(ranked_chunks)
-    keywords = extract_keywords(ranked_chunks)
-    questions = generate_questions(ranked_chunks)
+    summary = summarize(chunks)
+    keywords = extract_keywords(chunks)
+    questions = generate_questions(chunks)
     flashcards = generate_flashcards(keywords)
     
     # Return outputs
