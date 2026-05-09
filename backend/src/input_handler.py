@@ -92,20 +92,3 @@ def process_text(file_path=None, text=None, max_words=150):
     return chunks
 
 
-if __name__ == "__main__":
-    sample_text = """
-    Page 1
-
-    Machine learning is a field of artificial intelligence. It allows computers to learn from data.
-    Supervised learning uses labeled examples. Unsupervised learning finds patterns without labels.
-
-    2
-
-    Neural networks are often used in NLP. They can process text, images, and other data.
-    """
-
-    chunks = process_text(text=sample_text)
-
-    for i, chunk in enumerate(chunks, 1):
-        print(f"\nChunk {i}:")
-        print(chunk)
