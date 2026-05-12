@@ -1,6 +1,13 @@
 
 import re
 import fitz
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
+def split_sentences(text):
+    doc = nlp(text)
+    return [sent.text.strip() for sent in doc.sents]
 
 #extracts raw text from a pdf file using pymupdf.
 def extract_text_from_pdf(file_path):
@@ -33,14 +40,9 @@ def clean_text(text):
 
 
 #splits text into smaller chunks
-def split_text_into_chunks(text, max_words=150):
-
-    text = clean_text(text)
-
-    if not text:
+def split_text_into_chunks(sentences, max_words=150):
+    if not sentences:
         return []
-
-    sentences = re.split(r"(?<=[.!?])\s+", text)
 
     chunks = []
     current_chunk = []
@@ -87,8 +89,9 @@ def process_text(file_path=None, text=None, max_words=150):
 
     raw_text = load_text(file_path=file_path, text=text)
     cleaned_text = clean_text(raw_text)
-    chunks = split_text_into_chunks(cleaned_text, max_words=max_words)
+    sentences = split_sentences(cleaned_text)
+    chunks = split_text_into_chunks(sentences, max_words=max_words)
 
-    return chunks
+    return chunks, sentences
 
 
