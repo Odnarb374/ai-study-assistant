@@ -4,10 +4,16 @@ from keywords import extract_keywords
 from question_generator import generate_questions
 from flashcards import generate_flashcards
 from transformers import AutoTokenizer
-
+import spacy
 
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
+
+nlp = spacy.load("en_core_web_sm")
+
+def split_sentences(text):
+    doc = nlp(text)
+    return [sent.text.strip() for sent in doc.sents]
 
 def chunk_text(text, max_tokens=200):
     tokens = tokenizer.encode(text)
@@ -25,14 +31,15 @@ def run_pipeline(file_path=None, text=None):
     # Load text
     loaded_text = load_text(file_path, text)
     
-    # Chunk
+    # Chunk & split sentences
     chunks = chunk_text(loaded_text)
+    sentences = split_sentences(loaded_text)
  
     # Generate outputs
     summary = summarize(chunks)
     keywords = extract_keywords(chunks)
     questions = generate_questions(chunks)
-    flashcards = generate_flashcards(keywords)
+    flashcards = generate_flashcards(keywords,sentences)
     
     # Return outputs
     return {
