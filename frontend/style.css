@@ -41,3 +41,26 @@ button {
     margin-top: 10px;
     white-space: pre-wrap;
 }
+
+.flashcard {
+    border: 2px solid #333;
+    padding: 30px;
+    margin-top: 10px;
+    background: #f9f9f9;
+    cursor: pointer;
+    text-align: center;
+    font-size: 18px;
+    user-select: none;
+}
+
+.flashcard-controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.flashcard-controls button {
+    padding: 8px 15px;
+    cursor: pointer;
+}
