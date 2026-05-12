@@ -1,4 +1,4 @@
-from input_handler import load_text, rank_chunks
+from input_handler import load_text
 from summarizer import summarize
 from keywords import extract_keywords
 from question_generator import generate_questions
