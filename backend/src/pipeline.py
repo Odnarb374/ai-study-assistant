@@ -1,8 +1,8 @@
-from input_handler import process_text
-from summarizer import summarize
-from keywords import extract_keywords
-from question_generator import generate_questions
-from flashcards import generate_flashcards
+from .input_handler import process_text
+from .summarizer import summarize
+from .keywords import extract_keywords
+from .question_generator import generate_questions
+from .flashcards import generate_flashcards
 from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")

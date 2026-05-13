@@ -11,27 +11,40 @@ document.getElementById("submitButton").addEventListener("click", async () => {
     // Get file
     const file = document.getElementById("fileInput").files[0];
 
-    // Temporary fake outputs for testing frontend
+    const formData = new FormData();
+    if (file) {
+        formData.append("file", file);
+    }
+    formData.append("text", text);
 
-    document.getElementById("summaryBox").innerText =
-        "This is a sample summary.";
+    try {
+        const response = await fetch("http://localhost:3000/upload", {
+            method: "POST",
+            body: formData
+        });
 
-    document.getElementById("keywordsBox").innerText =
-        "AI, Study, Learning, Notes";
+        const data = await response.json();
 
-    document.getElementById("questionsBox").innerText =
-        "1. What is AI?\n2. What is machine learning?";
+        // Fill other sections
+        document.getElementById("summaryBox").innerText = data.summary;
+        document.getElementById("keywordsBox").innerText = data.keywords;
+        document.getElementById("questionsBox").innerText = data.questions;
 
-    // Fake backend data for now
-    flashcards = [
-        { q: "What is AI?", a: "Artificial Intelligence" },
-        { q: "What is ML?", a: "Machine Learning" }
-    ];
+        // Convert tuple array -> object array
+        flashcards = data.flashcards.map(([q, a]) => ({
+            q,
+            a
+        }));
 
-    currentIndex = 0;
-    showingAnswer = false;
+        currentIndex = 0;
+        showingAnswer = false;
 
-    showFlashcard();
+        showFlashcard();
+
+    } catch (err) {
+        console.error(err);
+        alert("Backend error or server not running");
+    }
 });
 
 function showFlashcard() {

@@ -1,51 +1,38 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
 
+from src.pipeline import run_pipeline
+
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+CORS(app)  # allows frontend to connect
 
-# Check for pdf/txt files
-ALLOWED_FILES = {'pdf', 'txt'}
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_FILES
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+@app.route("/upload", methods=["POST"])
+def upload():
 
-    # POST for uploading a pdf/txt or pasting/typing text and showing output
-    if request.method == 'POST':
-        # Get the inputs
-        text_input = request.form.get('text_input')
+    text = request.form.get("text")
+    file = request.files.get("file")
 
-        file = request.files.get('file')
-        file_path = None
+    file_path = None
 
-        # Check if correct files
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
+    # Save file if provided
+    if file:
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(file_path)
 
-        # Send the text/file to pipeline
-        result = process_input(text_input, file_path)
+    # Run pipeline
+    result = run_pipeline(
+        file_path=file_path,
+        text=text
+    )
 
-        return render_template('results.html', result=result)
-
-    # GET for getting pdf/txt or pasting/typing text
-    if request.method == 'GET':
-        return render_template('input.html')
-
-
-# Send input to backend and get back output
-def process_input(text_input, file_path):
-    return {
-        "summary": "Summary",
-        "key_terms": ["Terms"],
-        "questions": ["Questions"],
-        "flashcards": [("Term", "Definition")]
-    }
+    return jsonify(result)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=3000)
