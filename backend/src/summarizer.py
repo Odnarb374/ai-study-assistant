@@ -20,10 +20,10 @@ def summarize(chunks):
         text = text[:max_chars]
     
     # Initialize summarization pipeline
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    summarizer = pipeline("text-generation", model="facebook/bart-large-cnn")
     
     # Generate summary
     summary_result = summarizer(text, max_length=150, min_length=30, do_sample=False)
-    summary = summary_result[0]['summary_text']
+    summary = summary_result[0]['generated_text']
     
     return summary
