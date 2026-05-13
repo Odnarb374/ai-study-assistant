@@ -28,7 +28,7 @@ document.getElementById("submitButton").addEventListener("click", async () => {
         // Fill other sections
         document.getElementById("summaryBox").innerText = data.summary;
         document.getElementById("keywordsBox").innerText = data.keywords;
-        document.getElementById("questionsBox").innerText = data.questions;
+        document.getElementById("questionsBox").innerText = data.questions.join("\n\n");
 
         // Convert tuple array -> object array
         flashcards = data.flashcards.map(([q, a]) => ({
