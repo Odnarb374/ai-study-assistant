@@ -1,4 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import re
 
 tokenizer = AutoTokenizer.from_pretrained(
     "google/flan-t5-base"
@@ -13,28 +14,53 @@ def generate_flashcards(keywords,sentences):
 
 
     for keyword in keywords:
-        # find the keyword, and get surrounding sentences
+
+        # Find sentence containing keyword
         context = ""
+
         for i, s in enumerate(sentences):
-            if keyword.lower() in s.lower():
-                context = " ".join(sentences[max(0,i-1):i+2])
+
+            # whole-word matching
+            if re.search(rf"\b{re.escape(keyword)}\b", s, re.IGNORECASE):
+
+                # surrounding sentences
+                context = " ".join(
+                    sentences[max(0, i-1): min(len(sentences), i+2)]
+                )
                 break
-        input_text = f"""
-Create a definition for this keyword based on the context
+
+        # fallback
+        if not context:
+            context = "No context available."
+
+        prompt = f"""
+You are creating study flashcards.
+
+Using ONLY the context below, write a short student-friendly definition.
 
 Keyword: {keyword}
-Context: {context}
 
-Definition: 
+Context:
+{context}
+
+Definition:
 """
-        input_ids = tokenizer(input_text, return_tensors="pt").input_ids
+
+        inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
 
         outputs = model.generate(
-            input_ids,
-            max_new_tokens=100,
-            num_beams=5,
-            early_stopping=True
+            **inputs,
+            max_new_tokens=50,
+            num_beams=4,
+            temperature=0.7,
+            repetition_penalty=1.5
         )
-        result = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        flashcards.append([keyword,result])
+
+        definition = tokenizer.decode(
+            outputs[0],
+            skip_special_tokens=True
+        ).strip()
+
+        flashcards.append([keyword, definition])
+
     return flashcards
