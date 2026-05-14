@@ -36,7 +36,32 @@ def generate_flashcards(keywords,sentences):
         prompt = f"""
 You are creating study flashcards.
 
-Using ONLY the context below, write a short student-friendly definition.
+Using ONLY the context below:
+- Write a short student-friendly definition
+- Focus on the keyword
+- Keep the answer concise
+- Do not add outside information
+
+Example 1
+Keyword: Photosynthesis
+
+Context:
+Photosynthesis is the process plants use to convert sunlight into energy.
+
+Definition:
+The process plants use to convert sunlight into energy.
+
+Example 3
+Keyword: Mitochondria
+
+Context:
+Mitochondria are organelles that generate energy for the cell.
+
+Definition:
+Organelles that generate energy for the cell.
+
+
+Now create a new flashcard definition.
 
 Keyword: {keyword}
 
