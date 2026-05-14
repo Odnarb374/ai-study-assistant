@@ -1,68 +1,65 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSeq2SeqLM
+)
 
 tokenizer = AutoTokenizer.from_pretrained(
-    "mrm8488/t5-base-finetuned-question-generation-ap"
+    "google/flan-t5-base"
 )
+
 model = AutoModelForSeq2SeqLM.from_pretrained(
-    "mrm8488/t5-base-finetuned-question-generation-ap"
+    "google/flan-t5-base"
 )
 
 
-def generate_question(chunk: str) -> str:
-    """Generate an open-ended question from a passage."""
-    # Format expected by this fine-tuned model
-    input_text = f"answer: context: {chunk}"
-    input_ids = tokenizer(
-        input_text,
-        return_tensors="pt",
-        truncation=True,
-        max_length=512
-    ).input_ids
+def generate_questions(chunks):
+    questions = []
 
-    outputs = model.generate(
-        input_ids,
-        max_new_tokens=64,
-        num_beams=4,
-        early_stopping=True
-    )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-
-def generate_answer(chunk: str, question: str) -> str:
-    """Answer a question using the passage as context."""
-    prompt = (
-        f"Answer based only on the passage.\n\n"
-        f"Passage: {chunk}\n\n"
-        f"Question: {question}\n\n"
-        f"Answer:"
-    )
-    input_ids = tokenizer(
-        prompt,
-        return_tensors="pt",
-        truncation=True,
-        max_length=512
-    ).input_ids
-
-    outputs = model.generate(
-        input_ids,
-        max_new_tokens=60,
-        num_beams=4,
-        early_stopping=True
-    )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-
-def generate_questions(chunks: list[str]) -> list[dict]:
-    """Return a list of {question, answer} dicts for each chunk."""
-    qa_pairs = []
 
     for chunk in chunks:
-        question = generate_question(chunk)
-        answer = generate_answer(chunk, question)
+        input_text = f"""
+Read the passage and create one factual quiz question.
 
-        print(f"Q: {question}")
-        print(f"A: {answer}\n")
+Passage:
+{chunk}
 
-        qa_pairs.append({"question": question, "answer": answer})
+Quiz Question: 
+"""
+        input_ids = tokenizer(input_text, return_tensors="pt").input_ids
 
-    return qa_pairs
+        outputs = model.generate(
+            input_ids,
+            max_new_tokens=100,
+            num_beams=5,
+            early_stopping=True
+        )
+        result = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        print(result)
+        questions.append(result)
+
+        input_text = f"""
+Read the passage and answer the quiz question.
+
+Passage:
+{chunk}
+
+Quiz Question: 
+{result}
+
+Answer:
+"""
+        input_ids = tokenizer(input_text, return_tensors="pt").input_ids
+
+        outputs = model.generate(
+            input_ids,
+            max_new_tokens=100,
+            num_beams=5,
+            early_stopping=True
+        )
+        result = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        print(result)
+        questions.append(result)
+
+    return questions
