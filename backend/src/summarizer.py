@@ -1,29 +1,34 @@
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import torch
+# Initialize summarization pipeline
+model_name="facebook/bart-large-cnn"
+    
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
 def summarize(chunks):
-    """
-    Summarize text chunks using a transformer model.
-    
-    Args:
-        chunks: List of text strings
-        
-    Returns:
-        String containing the summary
-    """
-    # Combine all chunks
-    text = " ".join(chunks)
-    
-    # Limit text length for the model (max ~1024 tokens for most summarization models)
-    # Approximate: 1 token ≈ 4 characters
-    max_chars = 4096
-    if len(text) > max_chars:
-        text = text[:max_chars]
-    
-    # Initialize summarization pipeline
-    summarizer = pipeline("text-generation", model="facebook/bart-large-cnn")
-    
-    # Generate summary
-    summary_result = summarizer(text, max_length=150, min_length=30, do_sample=False)
-    summary = summary_result[0]['generated_text']
-    
-    return summary
+    summaries = []
+
+    for chunk in chunks:
+        inputs = tokenizer(
+            chunk,
+            return_tensors="pt",
+            truncation=True,
+            max_length=1024
+        )
+
+        summary_ids = model.generate(
+            inputs["input_ids"],
+            max_length=80,
+            min_length=20,
+            num_beams=4
+        )
+
+        summary = tokenizer.decode(
+            summary_ids[0],
+            skip_special_tokens=True
+        )
+
+        summaries.append(summary)
+
+    return " ".join(summaries)
