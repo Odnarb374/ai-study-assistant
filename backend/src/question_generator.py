@@ -18,12 +18,32 @@ def generate_questions(chunks):
 
     for chunk in chunks:
         input_text = f"""
-Read the passage and create one factual quiz question.
+Create a short answer study question ONLY from the following passage.
+
+Example 1
+Passage:
+Water boils at 100 degrees Celsius at sea level.
+
+Question:
+At what temperature does water boil at sea level?
+
+Answer:
+100 degrees Celsius
+
+Example 2
+Passage:
+The mitochondria produces energy for the cell.
+
+Question:
+What is the function of the mitochondria?
+
+Answer:
+It produces energy for the cell.
 
 Passage:
 {chunk}
 
-Quiz Question: 
+Question: 
 """
         input_ids = tokenizer(input_text, return_tensors="pt").input_ids
 
