@@ -1,5 +1,4 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import torch
 # Initialize summarization pipeline
 model_name="facebook/bart-large-cnn"
     
