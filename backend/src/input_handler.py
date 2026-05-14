@@ -2,8 +2,15 @@
 import re
 import fitz
 import spacy
+from spacy.cli import download
 
-nlp = spacy.load("en_core_web_sm")
+MODEL_NAME = "en_core_web_sm"
+
+try:
+    nlp = spacy.load(MODEL_NAME)
+except OSError:
+    download(MODEL_NAME)
+    nlp = spacy.load(MODEL_NAME)
 
 def split_sentences(text):
     doc = nlp(text)
